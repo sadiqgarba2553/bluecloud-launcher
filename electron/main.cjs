@@ -9,6 +9,7 @@ const {extractPackage}=require('./extract.cjs');
 const semver=require('semver');
 const {safePath,trustedDownload,verifyFeed,validAppId}=require('./security.cjs');
 const {applyUpdate,verifyInstaller}=require('./updater.cjs');
+const {downloadPackage}=require('./download.cjs');
 const {createShortcuts}=require('./shortcuts.cjs');
 const {createAssociations}=require('./associations.cjs');
 const config=require('../config.json');
@@ -28,16 +29,26 @@ const shortcuts=createShortcuts({fs,shell,root:shortcutRoot,library});
 const associations=createAssociations({fs,library,enabled:process.platform==='win32'&&!isolatedProfile});
 async function syncShortcut(id){try{await shortcuts.sync(id,installed[id],productList().find(p=>p.id===id));await associations.sync(id,installed[id]);}catch(error){await recordError(id,new Error(`App installed, but its Windows integration could not be completed: ${error.message}`));}}
 const jobs=new Map(),children=new Map();let saveQueue=Promise.resolve();
+const paused=new Set(),downloadDirectory=path.join(library,'.downloads');
+const partialFile=r=>path.join(downloadDirectory,`${r.appId}-${r.sha256}.part`);
 function saveRegistry(){saveQueue=saveQueue.catch(()=>{}).then(async()=>{await fs.mkdir(path.dirname(registryPath),{recursive:true});await fs.writeFile(registryPath+'.tmp',JSON.stringify(installed,null,2));await fs.rename(registryPath+'.tmp',registryPath);});return saveQueue;}
 function sender(event){if(event.sender!==win?.webContents||event.senderFrame?.url.split('#')[0]!==start)throw Error('Untrusted window');}
 function idCheck(id){if(!validAppId(id)||!(products.some(p=>p.id===id)||installed[id]||feed?.releases.some(r=>r.appId===id)))throw Error('Unknown app');}
 function productList(){const list=[...products];for(const r of feed?.releases||[])if(!list.some(p=>p.id===r.appId))list.push({id:r.appId,name:typeof r.name==='string'?r.name.slice(0,100):r.appId,category:typeof r.category==='string'?r.category.slice(0,80):'BlueCloud app',description:typeof r.description==='string'?r.description.slice(0,1000):'Install and manage this app in your BlueCloud library.',version:r.version,note:r.notes||''});for(const id of Object.keys(installed))if(!list.some(p=>p.id===id))list.push({id,name:id,category:'Installed app',description:'Installed in your BlueCloud library.',version:installed[id].version});return list;}
 async function recordError(id,error){appErrors[id]=error.name==='AbortError'?'Cancelled. You can retry this installation.':error.message;await fs.appendFile(path.join(app.getPath('userData'),'operations.log'),JSON.stringify({time:new Date().toISOString(),app:id,error:appErrors[id]})+'\n').catch(()=>{});}
-async function openLink(input){idCheck(input?.id);const links={website:'https://bluecloudai.online/',source:`https://github.com/sadiqgarba2553/bluecloud-website/tree/main/apps/${input.id}`,support:'mailto:sadeeqsgi@icloud.com'};if(!Object.hasOwn(links,input.kind))throw Error('Unknown link');await shell.openExternal(links[input.kind]);return state();}
+async function openLink(input){idCheck(input?.id);const links={website:'https://bluecloudai.online/',source:`https://github.com/${config.repositories[input.id]||config.repository}`,support:'mailto:sadeeqsgi@icloud.com'};if(!Object.hasOwn(links,input.kind))throw Error('Unknown link');await shell.openExternal(links[input.kind]);return state();}
 function emit(id,phase,percent=0){if(!win?.isDestroyed())win?.webContents.send('progress',{id,phase,percent});}
-function state(){return{products:productList(),installed,releases:(feed?.releases||[]).map(r=>({...r,requiresLauncher:!semver.gte(version,r.minimumLauncher),updateAvailable:semver.gt(r.version,r.appId==='launcher'?version:installed[r.appId]?.version||r.version)})),version,channel:config.channel,error:lastError,appErrors:{...appErrors},busy:[...jobs.keys()],bulkRemoving,autoUpdate,selfUpdate:pendingUpdate?{version:pendingUpdate.release.version,phase:pendingUpdate.phase,deferred:deferUpdate}:null};}
+function state(){return{products:productList(),installed,releases:(feed?.releases||[]).map(r=>({...r,requiresLauncher:!semver.gte(version,r.minimumLauncher),updateAvailable:semver.gt(r.version,r.appId==='launcher'?version:installed[r.appId]?.version||r.version)})),version,channel:config.channel,error:lastError,appErrors:{...appErrors},busy:[...jobs.keys()],paused:[...paused],bulkRemoving,autoUpdate,selfUpdate:pendingUpdate?{version:pendingUpdate.release.version,phase:pendingUpdate.phase,deferred:deferUpdate}:null};}
 function broadcast(){if(!win?.isDestroyed())win?.webContents.send('state-changed',state());}
-function scheduleUpdate(){if(!app.isPackaged||!pendingUpdate||pendingUpdate.phase!=='ready'||!autoUpdate||deferUpdate||updateTimer)return;updateTimer=setTimeout(async()=>{updateTimer=null;if(jobs.size||bulkRemoving){scheduleUpdate();return;}try{pendingUpdate.phase='restarting';broadcast();await applyUpdate({app,installer:pendingUpdate.file,release:pendingUpdate.release,directory:updateDirectory});}catch(error){pendingUpdate.phase='ready';deferUpdate=true;await recordError('launcher',error);broadcast();}},15000);}
+async function restartUpdate(){
+  if(!pendingUpdate||pendingUpdate.phase!=='ready')return state();
+  if(jobs.size||bulkRemoving)throw Error('Wait for downloads and app operations to finish before restarting.');
+  clearTimeout(updateTimer);updateTimer=null;deferUpdate=false;pendingUpdate.phase='restarting';broadcast();
+  try{await applyUpdate({app,installer:pendingUpdate.file,release:pendingUpdate.release,directory:updateDirectory});}
+  catch(error){pendingUpdate.phase='ready';deferUpdate=true;await recordError('launcher',error);broadcast();throw error;}
+  return state();
+}
+function scheduleUpdate(){if(!app.isPackaged||!pendingUpdate||pendingUpdate.phase!=='ready'||!autoUpdate||deferUpdate||updateTimer)return;updateTimer=setTimeout(async()=>{updateTimer=null;if(jobs.size||bulkRemoving){scheduleUpdate();return;}await restartUpdate().catch(()=>{});},15000);}
 async function checkSelfUpdate(){if(!app.isPackaged||!autoUpdate||deferUpdate||jobs.has('launcher'))return;const r=feed?.releases.find(r=>r.appId==='launcher'&&semver.gt(r.version,version));if(pendingUpdate){if(r&&r.version===pendingUpdate.release.version&&r.sha256===pendingUpdate.release.sha256){scheduleUpdate();return;}pendingUpdate=null;}if(r)try{await install('launcher');}catch{} }
 async function refresh(){
   try{
@@ -48,24 +59,10 @@ async function refresh(){
     const next=verifyFeed(rows[0].envelope,config.publicKey,config.channel,version);
     if(Date.parse(next.publishedAt)<highestPublished)throw Error('Release feed is older than the last trusted feed');
     highestPublished=Date.parse(next.publishedAt);feed=next;lastError='';await fs.writeFile(feedCache,JSON.stringify(rows[0].envelope));
+    for(const r of feed.releases)if(!jobs.has(r.appId))try{if((await fs.stat(partialFile(r))).size>0)paused.add(r.appId);}catch{}
   }catch(error){lastError=error.message;}
   broadcast();queueMicrotask(checkSelfUpdate);return state();
 }
-async function downloadOnce(release,dest,signal){
-  let url=trustedDownload(release.url),response;
-  for(let i=0;i<6;i++){
-    response=await fetch(url,{signal,redirect:'manual'});
-    if([301,302,303,307,308].includes(response.status)){const location=response.headers.get('location');await response.body?.cancel();if(!location)throw Error('Missing download redirect');url=trustedDownload(new URL(location,url).href);continue;}
-    break;
-  }
-  if(!response?.ok||!response.body)throw Error(`Download failed (${response?.status})`);
-  const hash=crypto.createHash('sha256');let bytes=0;const file=await fs.open(dest,'wx');
-  let lastPercent=-1;
-  try{for await(const chunk of response.body){signal.throwIfAborted();bytes+=chunk.length;if(bytes>release.size)throw Error('Package exceeds the expected size');hash.update(chunk);let offset=0;while(offset<chunk.length){const result=await file.write(chunk,offset,chunk.length-offset);if(result.bytesWritten===0)throw Error('Could not write the downloaded package');offset+=result.bytesWritten;}const percent=Math.round(bytes/release.size*100);if(percent!==lastPercent){lastPercent=percent;emit(release.appId,'Downloading',percent);}}}
-  finally{await file.close();}
-  if(bytes!==release.size||hash.digest('hex')!==release.sha256)throw Error('Package verification failed. Retry the download.');
-}
-async function download(release,dest,signal){for(let attempt=1;attempt<=3;attempt++){try{return await downloadOnce(release,dest,signal);}catch(error){await fs.rm(dest,{force:true}).catch(()=>{});if(signal.aborted||attempt===3||/verification failed|exceeds|Untrusted|outside the BlueCloud/.test(error.message))throw error;emit(release.appId,`Connection interrupted. Retrying (${attempt+1}/3)`,0);await new Promise((resolve,reject)=>{const done=()=>{signal.removeEventListener('abort',abort);resolve();},timer=setTimeout(done,attempt*1000),abort=()=>{clearTimeout(timer);signal.removeEventListener('abort',abort);reject(signal.reason);};if(signal.aborted)abort();else signal.addEventListener('abort',abort,{once:true});});}}}
 async function running(id){const child=children.get(id);if(child&&child.exitCode===null)return true;const entry=installed[id];if(!entry)return false;try{const {stdout}=await promisify(execFile)('tasklist.exe',['/FI',`IMAGENAME eq ${path.basename(entry.executable)}`,'/FO','CSV','/NH'],{windowsHide:true});return stdout.toLowerCase().includes(`"${path.basename(entry.executable).toLowerCase()}"`);}catch{throw Error('Could not check whether the app is running. Close the app and retry.');}}
 async function install(id){
   idCheck(id);if(bulkRemoving)throw Error('Wait for app removal to finish.');if(jobs.has(id))throw Error('This app already has an operation in progress');
@@ -74,25 +71,44 @@ async function install(id){
   if(id!=='launcher'&&!semver.gte(version,r.minimumLauncher))throw Error('The launcher is updating. Try this app after it restarts.');
   if(Date.parse(feed.expiresAt)<=Date.now())throw Error('Release information expired. Check for updates again.');
   const old=installed[id];if(old&&!old.broken&&!semver.gt(r.version,old.version))throw Error('The installed version is already current.');
-  delete appErrors[id];
+  delete appErrors[id];paused.delete(id);
   const controller=new AbortController();jobs.set(id,controller);const work=path.join(library,`.download-${id}-${crypto.randomUUID()}`);let destination;
   try{
     if(id!=='launcher'&&await running(id))throw Error('Close the app before updating it.');
     await fs.mkdir(work,{recursive:true});const disk=await fs.statfs(work);if(disk.bavail*disk.bsize<r.size+r.unpackedSize+100000000)throw Error('Not enough free disk space.');
-    const archive=path.join(work,r.packageType==='zip'?'package.zip':'setup.exe');await download(r,archive,AbortSignal.any([controller.signal,AbortSignal.timeout(1800000)]));controller.signal.throwIfAborted();emit(id,'Verifying',100);
+    await fs.mkdir(downloadDirectory,{recursive:true});const archive=partialFile(r);controller.phase='download';
+    for(let attempt=1;attempt<=3;attempt++)try{await downloadPackage(r,archive,{signal:AbortSignal.any([controller.signal,AbortSignal.timeout(1800000)]),progress:data=>{if(!win?.isDestroyed())win?.webContents.send('progress',{id,...data});}});break;}catch(error){if(controller.signal.aborted||attempt===3||/verification|exceeds|Untrusted|outside|range/.test(error.message))throw error;emit(id,`Connection interrupted. Retrying (${attempt+1}/3)`,0);}
+    controller.signal.throwIfAborted();controller.phase='install';emit(id,'Verifying',100);
     if(id==='launcher'){await fs.mkdir(updateDirectory,{recursive:true});const file=path.join(updateDirectory,`launcher-${r.version}.exe`);await fs.rename(archive,file);pendingUpdate={file,release:r,phase:'ready'};await fs.writeFile(path.join(updateDirectory,'pending.json'),JSON.stringify({file,release:r}));broadcast();scheduleUpdate();return state();}
     emit(id,'Installing',100);const unpack=path.join(work,'unpacked');
     await extractPackage(archive,unpack,r.unpackedSize,controller.signal);
     controller.signal.throwIfAborted();const exe=safePath(unpack,r.executable);const stat=await fs.lstat(exe);if(!stat.isFile()||stat.isSymbolicLink())throw Error('Package executable is missing');
     destination=safePath(library,`${id}/${r.version}-${crypto.randomUUID()}`);await fs.mkdir(path.dirname(destination),{recursive:true});await fs.rename(unpack,destination);
-    installed[id]={version:r.version,directory:path.relative(library,destination).replaceAll('\\','/'),executable:r.executable,installedAt:new Date().toISOString()};
+    installed[id]={version:r.version,directory:path.relative(library,destination).replaceAll('\\','/'),executable:r.executable,installedAt:new Date().toISOString(),...(old&&!old.broken?{previous:{version:old.version,directory:old.directory,executable:old.executable,installedAt:old.installedAt}}:{})};
     try{await saveRegistry();}catch(error){if(old)installed[id]=old;else delete installed[id];await fs.rm(destination,{recursive:true,force:true});throw error;}
     await syncShortcut(id);
+    await fs.rm(archive,{force:true});
     // Keep the previous version for manual recovery; never delete app profile data.
     emit(id,'Ready',100);
-  }catch(error){await recordError(id,error);throw error;}finally{jobs.delete(id);await fs.rm(work,{recursive:true,force:true,maxRetries:5,retryDelay:200}).catch(()=>{});emit(id,'Finished',100);broadcast();scheduleUpdate();}
+  }catch(error){if(controller.pauseRequested){paused.add(id);return state();}if(controller.signal.aborted)await fs.rm(partialFile(r),{force:true}).catch(()=>{});else try{if((await fs.stat(partialFile(r))).size>0)paused.add(id);}catch{}await recordError(id,error);throw error;}finally{jobs.delete(id);await fs.rm(work,{recursive:true,force:true,maxRetries:5,retryDelay:200}).catch(()=>{});emit(id,'Finished',100);broadcast();scheduleUpdate();}
   return state();
 }
+async function rollback(id){
+  idCheck(id);if(jobs.has(id)||bulkRemoving)throw Error('Wait for the current operation to finish.');
+  const current=installed[id],previous=current?.previous;if(!previous)throw Error('No previous installation is available.');
+  jobs.set(id,new AbortController());
+  try{
+    if(await running(id))throw Error('Close the app before restoring its previous version.');
+    if(!semver.valid(previous.version)||!previous.directory?.startsWith(id+'/'))throw Error('Invalid recovery installation');
+    const dir=safePath(library,previous.directory),exe=safePath(dir,previous.executable),stat=await fs.lstat(exe);
+    if(!stat.isFile()||stat.isSymbolicLink())throw Error('Previous installation is missing. Repair the app instead.');
+    installed[id]={...previous,previous:{version:current.version,directory:current.directory,executable:current.executable,installedAt:current.installedAt}};
+    try{await saveRegistry();}catch(error){installed[id]=current;throw error;}
+    delete appErrors[id];await syncShortcut(id);return state();
+  }finally{jobs.delete(id);broadcast();}
+}
+async function pause(id){idCheck(id);const job=jobs.get(id);if(!job||job.phase!=='download')throw Error('Only a download can be paused.');job.pauseRequested=true;job.abort(new Error('Download paused'));return state();}
+async function cancel(id){idCheck(id);paused.delete(id);const job=jobs.get(id);if(job){job.pauseRequested=false;job.abort();}else{const r=feed?.releases.find(r=>r.appId===id);if(r)await fs.rm(partialFile(r),{force:true});}return state();}
 async function launch(id){idCheck(id);if(jobs.has(id))throw Error('Wait for the update to finish.');const entry=installed[id];if(!entry)throw Error('Install this app first.');const dir=safePath(library,entry.directory);const exe=safePath(dir,entry.executable);const stat=await fs.lstat(exe);if(!stat.isFile()||stat.isSymbolicLink())throw Error('The installed executable is missing.');if(jobs.has(id))throw Error('Wait for the update to finish.');const child=spawn(exe,[],{cwd:dir,detached:true,stdio:'ignore'});await new Promise((resolve,reject)=>{child.once('spawn',resolve);child.once('error',reject);});children.set(id,child);child.once('exit',()=>children.delete(id));child.unref();return state();}
 async function uninstall(id,confirmed=false){
   idCheck(id);if(id==='launcher'||jobs.has(id))throw Error('This app cannot be removed during an operation.');if(!installed[id])return state();
@@ -112,14 +128,20 @@ else app.whenReady().then(async()=>{
   try{const saved=JSON.parse(await fs.readFile(registryPath,'utf8'));for(const [id,e]of Object.entries(saved)){if(!validAppId(id)||id==='launcher'||!semver.valid(e.version)||!e.directory.startsWith(id+'/'))continue;const dir=safePath(library,e.directory),exe=safePath(dir,e.executable);installed[id]=e;try{if(!(await fs.lstat(exe)).isFile())throw Error();}catch{installed[id].broken=true;appErrors[id]='App files are missing. Choose Repair app to reinstall.';}}}catch(error){if(error.code!=='ENOENT')lastError='The library record could not be read. Contact support before reinstalling apps.';}
   for(const id of Object.keys(installed))await syncShortcut(id);
   try{const envelope=JSON.parse(await fs.readFile(feedCache,'utf8'));feed=verifyFeed(envelope,config.publicKey,config.channel,version);highestPublished=Date.parse(feed.publishedAt);}catch{}
+  for(const r of feed?.releases||[])try{if((await fs.stat(partialFile(r))).size>0)paused.add(r.appId);}catch{}
   win=new BrowserWindow({width:1380,height:860,minWidth:920,minHeight:620,titleBarStyle:'hidden',titleBarOverlay:{color:'#14171d',symbolColor:'#9da8b9',height:65},backgroundColor:'#0e1013',webPreferences:{preload:path.join(__dirname,'preload.cjs'),nodeIntegration:false,contextIsolation:true,sandbox:true}});Menu.setApplicationMenu(null);
   win.webContents.setWindowOpenHandler(()=>({action:'deny'}));win.webContents.on('will-navigate',(event,url)=>{if(url.split('#')[0]!==start)event.preventDefault();});win.webContents.on('will-attach-webview',e=>e.preventDefault());
   try{autoUpdate=JSON.parse(await fs.readFile(path.join(app.getPath('userData'),'settings.json'),'utf8')).autoUpdate!==false;}catch{}
   try{const saved=JSON.parse(await fs.readFile(path.join(updateDirectory,'pending.json'),'utf8')),r=feed?.releases.find(r=>r.appId==='launcher'&&r.version===saved.release.version&&r.sha256===saved.release.sha256&&semver.gt(r.version,version));if(r){const file=path.join(updateDirectory,`launcher-${r.version}.exe`);await verifyInstaller(file,r);pendingUpdate={file,release:r,phase:'ready'};}}catch{}
-  for(const [name,handler]of Object.entries({state,refresh,install,launch,uninstall:id=>uninstall(id),uninstallAll,openLink,restartUpdate:async()=>{deferUpdate=false;if(pendingUpdate?.phase==='ready'&&!jobs.size&&!bulkRemoving)await applyUpdate({app,installer:pendingUpdate.file,release:pendingUpdate.release,directory:updateDirectory});return state();},deferUpdate:()=>{deferUpdate=true;clearTimeout(updateTimer);updateTimer=null;return state();},setAutoUpdate:async enabled=>{if(typeof enabled!=='boolean')throw Error('Invalid setting');autoUpdate=enabled;await fs.writeFile(path.join(app.getPath('userData'),'settings.json'),JSON.stringify({autoUpdate}));if(enabled){deferUpdate=false;checkSelfUpdate();scheduleUpdate();}return state();},cancel:id=>{idCheck(id);jobs.get(id)?.abort();return state();}}))ipcMain.handle(name,async(event,...args)=>{sender(event);try{return{ok:true,state:await handler(...args)};}catch(error){return{ok:false,error:error.message};}});
+  try{
+    const result=JSON.parse((await fs.readFile(path.join(updateDirectory,'last-update.json'),'utf8')).replace(/^\uFEFF/,''));
+    if(result.success===false&&pendingUpdate?.release.version===result.version){deferUpdate=true;await recordError('launcher',new Error('The last launcher update failed: '+result.error));}
+    if(result.success===true&&semver.valid(result.version)&&semver.gte(version,result.version))await fs.rm(path.join(updateDirectory,'pending.json'),{force:true});
+  }catch{}
+  for(const [name,handler]of Object.entries({state,refresh,install,launch,pause,rollback,uninstall:id=>uninstall(id),uninstallAll,openLink,restartUpdate,deferUpdate:()=>{deferUpdate=true;clearTimeout(updateTimer);updateTimer=null;return state();},setAutoUpdate:async enabled=>{if(typeof enabled!=='boolean')throw Error('Invalid setting');autoUpdate=enabled;await fs.writeFile(path.join(app.getPath('userData'),'settings.json'),JSON.stringify({autoUpdate}));if(enabled){deferUpdate=false;checkSelfUpdate();scheduleUpdate();}return state();},cancel}))ipcMain.handle(name,async(event,...args)=>{sender(event);try{return{ok:true,state:await handler(...args)};}catch(error){return{ok:false,error:error.message};}});
   win.loadURL(start);app.on('second-instance',()=>{if(win.isMinimized())win.restore();win.focus();});
   if(app.isPackaged){win.webContents.once('did-finish-load',()=>refresh());setInterval(()=>refresh(),10*60*1000).unref();}
-  win.on('close',event=>{if(app.isQuitting)return;if(jobs.size){event.preventDefault();dialog.showMessageBox(win,{message:'An app operation is in progress',detail:'Cancel the download or wait for installation to finish before closing.'});}else if(pendingUpdate?.phase==='ready'&&autoUpdate&&!deferUpdate){event.preventDefault();applyUpdate({app,installer:pendingUpdate.file,release:pendingUpdate.release,directory:updateDirectory}).catch(async error=>{await recordError('launcher',error);deferUpdate=true;broadcast();});}});
+  win.on('close',event=>{if(app.isQuitting)return;if(jobs.size){event.preventDefault();dialog.showMessageBox(win,{message:'An app operation is in progress',detail:'Cancel the download or wait for installation to finish before closing.'});}else if(pendingUpdate?.phase==='ready'&&autoUpdate&&!deferUpdate){event.preventDefault();restartUpdate().catch(()=>{});}});
 });
 app.on('before-quit',()=>{app.isQuitting=true;});
 app.on('window-all-closed',()=>app.quit());

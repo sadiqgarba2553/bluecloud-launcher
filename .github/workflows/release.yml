@@ -15,8 +15,10 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
+      - run: npm run test:desktop
       - run: node --test tools/release.test.mjs
       - run: npm run dist:win
+      - run: node scripts/smoke-live.cjs catalog
       - run: node tools/release.mjs prepare
       - run: node tools/release.mjs publish
         env:

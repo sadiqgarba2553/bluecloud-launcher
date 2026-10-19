@@ -1,12 +1,7 @@
-# BlueCloud Launcher
+# BlueCloud Launcher 0.6.0
 
-Standalone Windows app for installing, opening and updating Coneic, Quranly PC and Tooldeck. This repository contains only the launcher and its update service.
+Install, open and update Coneic, Quranly and Tooldeck in their own public repositories. Downloads support pause/resume across restarts, size/speed/time feedback, integrity verification and restoring the previous app version. Windows updates acknowledge helper startup and verify the installed runtime before recording success. App profiles stay in place.
 
-- [Coneic source and releases](https://github.com/sadiqgarba2553/coneic)
-- [Quranly PC source and releases](https://github.com/sadiqgarba2553/quranly-pc)
-- [Tooldeck source and releases](https://github.com/sadiqgarba2553/tooldeck)
-- [Launcher releases](https://github.com/sadiqgarba2553/bluecloud-launcher/releases)
+See [release notes](RELEASE-NOTES.md), [release workflow](RELEASING.md), and [Windows signing](WINDOWS-SIGNING.md). Run `npm ci`, `npm test`, `npm run test:desktop`, then `npm run dist:win`.
 
-Run `npm ci`, then `npm run desktop`. `npm test` checks signatures, repository routing, extraction, update integrity and isolation. `npm run test:desktop` exercises the launcher with disposable profiles. `npm run dist:win` builds this app's installer in `release/`. Each other app has its own dependencies, build commands and installer.
-
-See [release instructions](RELEASING.md). Both publishing and download validation reject the website repository. The website is separate. The release endpoint authenticates Ed25519 tickets and redirects only to fixed app repositories; it never writes to GitHub or accesses user data.
+Each app owns its source and release assets. Never publish them to the website repository. Windows x64 preview; unsigned until a certificate is configured.

@@ -1,9 +1,11 @@
-# BlueCloud Launcher 0.5.1 for Windows
+# BlueCloud Launcher 0.6.0 for Windows
 
-Download **BlueCloud-Launcher-Setup-0.5.1-x64.exe** to install or update the standalone Windows launcher.
+Download **BlueCloud-Launcher-Setup-0.6.0-x64.exe** to install or update the launcher.
 
-Each app now has its own source repository and release: [Coneic](https://github.com/sadiqgarba2553/coneic), [Quranly PC](https://github.com/sadiqgarba2553/quranly-pc), [Tooldeck](https://github.com/sadiqgarba2553/tooldeck) and [Launcher](https://github.com/sadiqgarba2553/bluecloud-launcher). Website-repository downloads and publishing are rejected.
+- Windows updates confirm the helper started before closing the launcher, avoid an unavailable PowerShell hashing command, verify the installed runtime, and report failures without an automatic retry loop.
+- Pause and resume app downloads, including after restarting Launcher. Interrupted connections reuse partial downloads and verify the complete archive; progress shows downloaded size, speed and estimated time remaining.
+- Restore the previous installed app version from its menu. User profiles stay in place and Windows shortcuts follow the restored installation.
+- Apps requiring a newer Launcher show a direct update action. Source links open each app's own repository.
+- Windows signing configuration is ready for a certificate. This preview remains unsigned.
 
-The signed Supabase feed uses authenticated compatibility redirects so earlier launcher versions can receive this update. Downloads are served by the app repositories; private signing keys remain outside the repos and Actions. Existing installed-app registrations, settings and downloaded content are retained.
-
-Windows x64 preview; installer unsigned. Source, release metadata, runtime integrity and SHA-256 checksums are included.
+The signed release feed and compatible download redirects continue to use each app's public repository. Tests cover helper execution on Windows, installation, rollback, paused downloads across restarts, tampering and retained app data. Source, runtime-integrity metadata and SHA-256 checksums are included.

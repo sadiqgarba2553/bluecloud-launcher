@@ -45,7 +45,7 @@ async function main(){
     const archived=git(['archive','--format=zip',`--prefix=${config.sourceName}-${config.version}/`,`--output=${source}`,'HEAD']);if(archived.status)throw Error('Could not archive committed app source');await add(source);
     const binary=assets.find(a=>a.name===config.package.name);if(!binary)throw Error('Managed download or launcher installer is missing');
     const metadata={appId:config.appId,version:config.version,minimumLauncher:config.package.minimumLauncher,platform:'win32',arch:'x64',packageType:config.package.type,...(config.package.executable?{executable:config.package.executable}:{}),size:binary.size,unpackedSize:config.unpackedDirectory?await sum(path.join(root,config.unpackedDirectory)):config.package.unpackedSize,sha256:binary.sha256,url:url(binary.name),repository:config.repository,notes:config.notes};
-    if(config.unpackedDirectory)metadata.runtimeIntegrity={asarSHA256:await sha(path.join(root,config.unpackedDirectory,'resources/app.asar'))};
+    if(config.appId==='launcher'&&config.unpackedDirectory)metadata.runtimeIntegrity={asarSHA256:await sha(path.join(root,config.unpackedDirectory,'resources/app.asar'))};
     const meta=path.join(out,'app-release.json');await writeFile(meta,JSON.stringify(metadata,null,2)+'\n');await add(meta);
     const checksums=path.join(out,'SHA256SUMS.txt');await writeFile(checksums,assets.map(a=>`${a.sha256}  ${a.name}`).join('\n')+'\n');await add(checksums);
     const commit=git(['rev-parse','HEAD']).stdout.trim();await writeFile(manifestPath,JSON.stringify({tag,version:config.version,repository:config.repository,commit,assets},null,2)+'\n');

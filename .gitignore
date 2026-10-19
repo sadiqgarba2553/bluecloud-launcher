@@ -8,3 +8,7 @@ artifacts/
 .env.local
 *.pfx
 release-private.pem
+
+*.p12
+*.key
+*.pem
