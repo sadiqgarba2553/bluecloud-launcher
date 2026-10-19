@@ -1,6 +1,6 @@
-# BlueCloud Launcher 0.6.0 for Windows
+# BlueCloud Launcher 0.6.1 for Windows
 
-Download **BlueCloud-Launcher-Setup-0.6.0-x64.exe** to install or update the launcher.
+Download **BlueCloud-Launcher-Setup-0.6.1-x64.exe** to install or update the launcher.
 
 - Windows updates confirm the helper started before closing the launcher, avoid an unavailable PowerShell hashing command, verify the installed runtime, and report failures without an automatic retry loop.
 - Pause and resume app downloads, including after restarting Launcher. Interrupted connections reuse partial downloads and verify the complete archive; progress shows downloaded size, speed and estimated time remaining.

@@ -15,8 +15,8 @@ function File-SHA256([string]$File) {
 try {
   $update = Get-Content -LiteralPath $Plan -Raw -Encoding UTF8 | ConvertFrom-Json
   @{version=$update.version;phase='started';pid=$PID} | ConvertTo-Json | Set-Content -LiteralPath $update.ready -Encoding UTF8
-  $parent = Get-Process -Id $update.pid -ErrorAction SilentlyContinue
-  if ($parent) { Wait-Process -Id $update.pid -Timeout 60 -ErrorAction Stop }
+  Wait-Process -Id $update.pid -Timeout 60 -ErrorAction SilentlyContinue
+  if (Get-Process -Id $update.pid -ErrorAction SilentlyContinue) { throw 'The launcher did not close. Close it and retry the update.' }
   $hash = File-SHA256 $update.installer
   if ($hash -ne $update.sha256 -or (Get-Item -LiteralPath $update.installer).Length -ne $update.size) { throw 'Update integrity verification failed' }
   $arguments = @('/S', '--updated', ('/D=' + $update.directory))
