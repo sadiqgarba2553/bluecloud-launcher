@@ -1,0 +1,55 @@
+{
+  "name": "bluecloud-launcher",
+  "version": "0.5.1",
+  "private": true,
+  "description": "Install, open and update BlueCloud apps",
+  "author": "BLUECLOUD",
+  "main": "electron/main.cjs",
+  "scripts": {
+    "desktop": "electron .",
+    "dist:win": "electron-builder --win nsis --x64",
+    "test": "node --test tests/*.test.cjs",
+    "test:desktop": "playwright test --config playwright.config.cjs",
+    "release:prepare": "node tools/release.mjs prepare",
+    "release:publish": "node tools/release.mjs publish",
+    "release:verify": "node tools/verify-feed.mjs"
+  },
+  "dependencies": {
+    "yauzl": "^3.4.0",
+    "semver": "7.7.4"
+  },
+  "devDependencies": {
+    "electron": "44.9.0",
+    "electron-builder": "26.15.3",
+    "@playwright/test": "1.64.1",
+    "fflate": "0.8.3",
+    "7zip-bin": "5.2.0"
+  },
+  "build": {
+    "appId": "com.bluecloud.launcher",
+    "productName": "BlueCloud Launcher",
+    "electronVersion": "44.9.0",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "electron/**/*",
+      "ui/**/*",
+      "assets/**/*",
+      "config.json",
+      "products.json",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "assets/launcher.png",
+      "signExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "BlueCloud-Launcher-Setup-${version}-${arch}.${ext}"
+    }
+  }
+}

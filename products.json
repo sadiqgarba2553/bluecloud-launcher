@@ -1,0 +1,80 @@
+[
+  {
+    "id": "coneic",
+    "name": "Coneic Player",
+    "category": "Media player",
+    "tagline": "Your media. Your space.",
+    "description": "A Windows media player built on VLC, with a personal library, saved moments, study notes and smart collections.",
+    "version": "0.5.0",
+    "status": "Alpha",
+    "platform": "Windows x64",
+    "accent": "#ff9b65",
+    "icon": "play",
+    "features": [
+      "Local audio and video playback",
+      "Saved moments and study notes",
+      "Smart collections and command palette",
+      "Library backup and media relinking",
+      "Windows defaults and custom icons for 134 media formats"
+    ],
+    "note": "Development preview. Device and codec coverage varies; see the bundled validation notes."
+  },
+  {
+    "id": "quranly",
+    "name": "Quranly PC",
+    "category": "Quran & daily practice",
+    "tagline": "Make room for your daily practice.",
+    "description": "Read the Quran, listen to recitations, save audio offline and continue your daily practice on Windows.",
+    "version": "0.5.0",
+    "status": "Alpha",
+    "platform": "Windows x64",
+    "accent": "#a4a5ff",
+    "icon": "book",
+    "features": [
+      "Quran reader and reciter library",
+      "Offline recitations and playlists",
+      "Memorization review and daily azkar",
+      "Optional account backup and playback resume"
+    ],
+    "note": "All app features are free. New online content requires a connection; optional AI answers use your own provider key."
+  },
+  {
+    "id": "tooldeck",
+    "name": "Tooldeck",
+    "category": "Everyday utilities",
+    "tagline": "Small tools. A lot less friction.",
+    "description": "79 local PDF, image, video, audio, conversion and utility tools in a clean card library.",
+    "version": "0.5.0",
+    "status": "Alpha",
+    "platform": "Windows x64 \u00c3\u201a\u00c2\u00b7 Web",
+    "accent": "#85dfbb",
+    "icon": "tools",
+    "features": [
+      "Merge, extract and rotate PDF pages",
+      "Resize and convert images",
+      "JSON, text, Base64 and URL utilities",
+      "QR codes, passwords and file hashes"
+    ],
+    "webUrl": "/tool-deck/",
+    "note": "Files are processed locally. Conversion limits are explained in each workspace."
+  },
+  {
+    "id": "launcher",
+    "name": "BlueCloud Launcher",
+    "category": "Your app library",
+    "tagline": "One home for your BlueCloud apps.",
+    "description": "Discover, install, open and update BlueCloud apps from a single Windows library. No account needed to manage your apps.",
+    "version": "0.5.1",
+    "status": "Alpha",
+    "platform": "Windows x64",
+    "accent": "#83aeff",
+    "icon": "cloud",
+    "features": [
+      "One library for all three apps",
+      "Verified package downloads",
+      "Version checks and release notes",
+      "Installed apps stay available offline"
+    ],
+    "note": "Alpha release. Updates use a signed release feed. Public Windows publisher signing is required before a stable release."
+  }
+]

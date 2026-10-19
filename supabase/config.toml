@@ -1,0 +1,4 @@
+# The endpoint validates Ed25519 tickets itself; legacy desktop clients have no JWT.
+[functions.app-release-download]
+verify_jwt = false
+entrypoint = './functions/app-release-download/index.mjs'

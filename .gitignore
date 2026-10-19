@@ -1,0 +1,10 @@
+
+# App-owned builds and release staging
+node_modules/
+release/
+.release/
+artifacts/
+.env
+.env.local
+*.pfx
+release-private.pem

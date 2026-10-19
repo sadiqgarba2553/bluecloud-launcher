@@ -1,0 +1,13 @@
+{
+  "supabaseUrl": "https://rplxdjpbsbhorpucacic.supabase.co",
+  "publishableKey": "sb_publishable_nAQUWtAIP159JfSK-xX64w_wRhFHlCn",
+  "channel": "alpha",
+  "repository": "sadiqgarba2553/bluecloud-launcher",
+  "publicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEATRxYq/F2sfUOkJdIVmk5AQ8ROyq9lRtTEKcIhsbahMo=\n-----END PUBLIC KEY-----\n",
+  "repositories": {
+    "coneic": "sadiqgarba2553/coneic",
+    "quranly": "sadiqgarba2553/quranly-pc",
+    "tooldeck": "sadiqgarba2553/tooldeck",
+    "launcher": "sadiqgarba2553/bluecloud-launcher"
+  }
+}

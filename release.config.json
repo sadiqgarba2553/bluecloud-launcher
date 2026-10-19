@@ -1,0 +1,17 @@
+{
+  "appId": "launcher",
+  "repository": "sadiqgarba2553/bluecloud-launcher",
+  "version": "0.5.1",
+  "sourceName": "BlueCloud-Launcher",
+  "title": "BlueCloud Launcher 0.5.1 \u00b7 Windows",
+  "notes": "App-owned source and releases, verified downloads for Coneic, Quranly and Tooldeck, and automatic migration for previous launchers.",
+  "localAssets": [
+    "release/BlueCloud-Launcher-Setup-0.5.1-x64.exe"
+  ],
+  "unpackedDirectory": "release/win-unpacked",
+  "package": {
+    "name": "BlueCloud-Launcher-Setup-0.5.1-x64.exe",
+    "type": "nsis",
+    "minimumLauncher": "0.1.0-alpha"
+  }
+}
