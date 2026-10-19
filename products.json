@@ -64,7 +64,7 @@
     "category": "Your app library",
     "tagline": "One home for your BlueCloud apps.",
     "description": "Discover, install, open and update BlueCloud apps from a single Windows library. No account needed to manage your apps.",
-    "version": "0.6.1",
+    "version": "0.6.2",
     "status": "Alpha",
     "platform": "Windows x64",
     "accent": "#83aeff",

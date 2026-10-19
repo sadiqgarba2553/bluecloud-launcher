@@ -12,3 +12,6 @@ release-private.pem
 *.p12
 *.key
 *.pem
+
+# Rebuilt native updater executable
+build/

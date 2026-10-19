@@ -1,16 +1,16 @@
 {
   "appId": "launcher",
   "repository": "sadiqgarba2553/bluecloud-launcher",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "sourceName": "BlueCloud-Launcher",
-  "title": "BlueCloud Launcher 0.6.1 - Windows",
-  "notes": "Reliable Windows updates, resumable downloads with speed and time remaining, previous-version recovery, and app-owned source links.",
+  "title": "BlueCloud Launcher 0.6.2 - Windows",
+  "notes": "Native Windows updater survives Launcher exit and verifies installed files; resumable downloads, progress rates and previous-version recovery.",
   "localAssets": [
-    "release/BlueCloud-Launcher-Setup-0.6.1-x64.exe"
+    "release/BlueCloud-Launcher-Setup-0.6.2-x64.exe"
   ],
   "unpackedDirectory": "release/win-unpacked",
   "package": {
-    "name": "BlueCloud-Launcher-Setup-0.6.1-x64.exe",
+    "name": "BlueCloud-Launcher-Setup-0.6.2-x64.exe",
     "type": "nsis",
     "minimumLauncher": "0.1.0-alpha"
   }

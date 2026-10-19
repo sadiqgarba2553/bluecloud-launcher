@@ -1,14 +1,14 @@
 {
   "name": "bluecloud-launcher",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "private": true,
   "description": "Install, open and update BlueCloud apps",
   "author": "BLUECLOUD",
   "main": "electron/main.cjs",
   "scripts": {
     "desktop": "electron .",
-    "dist:win": "electron-builder --config electron-builder.config.cjs --win nsis --x64 --publish never",
-    "test": "node --test tests/*.test.cjs",
+    "dist:win": "node tools/build-updater.mjs && electron-builder --config electron-builder.config.cjs --win nsis --x64 --publish never",
+    "test": "node tools/build-updater.mjs && node --test tests/*.test.cjs",
     "test:desktop": "playwright test --config playwright.config.cjs",
     "release:prepare": "node tools/release.mjs prepare",
     "release:publish": "node tools/release.mjs publish",
@@ -50,6 +50,12 @@
       "perMachine": false,
       "allowToChangeInstallationDirectory": true,
       "artifactName": "BlueCloud-Launcher-Setup-${version}-${arch}.${ext}"
-    }
+    },
+    "extraResources": [
+      {
+        "from": "build/BlueCloudUpdate.exe",
+        "to": "updater/BlueCloudUpdate.exe"
+      }
+    ]
   }
 }
