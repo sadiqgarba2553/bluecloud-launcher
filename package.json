@@ -1,6 +1,6 @@
 {
   "name": "bluecloud-launcher",
-  "version": "0.6.2",
+  "version": "0.7.0",
   "private": true,
   "description": "Install, open and update BlueCloud apps",
   "author": "BLUECLOUD",
@@ -42,7 +42,7 @@
     ],
     "win": {
       "target": "nsis",
-      "icon": "assets/launcher.png",
+      "icon": "assets/launcher.ico",
       "signExecutable": false
     },
     "nsis": {

@@ -32,7 +32,7 @@ test('install all apps, update Tooldeck, reject tampering and retain the library
   const cfg=JSON.parse(await readFile(path.join(testApp,'config.json'),'utf8'));cfg.publicKey=keys.publicKey.export({type:'spki',format:'pem'});await writeFile(path.join(testApp,'config.json'),JSON.stringify(cfg));
   const start=()=>electron.launch({executablePath:electronExe,args:[testApp],env:{...process.env,BLUECLOUD_TEST_PROFILE:profile}});let app=await start();
   try{
-    let page=await app.firstWindow();await expect(page.getByRole('heading',{name:'Your app library.'})).toBeVisible();
+    let page=await app.firstWindow();await expect(page.getByRole('heading',{name:'Your apps. One home.'})).toBeVisible();
     await page.getByRole('button',{name:'Table view'}).click();await expect(page.locator('#library')).toHaveClass('app-table');await page.getByRole('button',{name:'Grid view'}).click();
     await page.getByRole('searchbox',{name:'Search apps'}).fill('quran');await expect(page.locator('#library article')).toHaveCount(1);await page.getByRole('searchbox',{name:'Search apps'}).fill('');
     async function publishFixture(version,tampered=false,future=false){
@@ -40,6 +40,7 @@ test('install all apps, update Tooldeck, reject tampering and retain the library
       const payload=JSON.stringify({schemaVersion:1,channel:'alpha',publishedAt:new Date().toISOString(),expiresAt:new Date(Date.now()+3600000).toISOString(),releases}),envelope={payload,signature:sign(null,Buffer.from(payload),keys.privateKey).toString('base64')};
       await app.evaluate((_electron,data)=>{global.fetch=async url=>String(url).includes('/rest/v1/')?new Response(JSON.stringify([{envelope:data.envelope}]),{headers:{'content-type':'application/json'}}):new Response(Buffer.from(data.archives[String(url)],'base64'));},{envelope,archives});await page.getByRole('button',{name:'Check for updates'}).click();
     }
+    for(const name of ['Doc Cloud','Sheet Cloud']){const card=page.getByRole('article',{name,exact:true});await expect(card.getByRole('button',{name:'Coming soon',exact:true})).toBeDisabled();await expect(card.locator('.app-status')).toHaveText('Coming soon');}
     await publishFixture('0.1.0-alpha.1');await page.getByRole('button',{name:'Install all 3 apps',exact:true}).click();await expect(page.getByRole('button',{name:'Open app ↗',exact:true})).toHaveCount(3);await expect(page.locator('#count-installed')).toHaveText('3');
     const links=await app.evaluate(({shell},files)=>files.map(file=>shell.readShortcutLink(file)),['coneic/Coneic Player','quranly/Quranly PC','tooldeck/Tool Deck'].map(name=>path.join(profile,'start-menu',name+'.lnk')));for(const link of links)expect(await readFile(link.target,'utf8')).toContain('fixture');
     const quranly=(await page.evaluate(()=>window.bluecloud.state())).state.installed.quranly;expect(await readFile(path.join(profile,'library',quranly.directory,'resources/app.asar'),'utf8')).toContain('fixture quranly');

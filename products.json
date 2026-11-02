@@ -44,10 +44,10 @@
     "category": "Everyday utilities",
     "tagline": "Small tools. A lot less friction.",
     "description": "79 local PDF, image, video, audio, conversion and utility tools in a clean card library.",
-    "version": "0.5.0",
+    "version": "0.5.1",
     "status": "Alpha",
     "platform": "Windows x64",
-    "accent": "#85dfbb",
+    "accent": "#ff3838",
     "icon": "tools",
     "features": [
       "Merge, extract and rotate PDF pages",
@@ -59,18 +59,54 @@
     "note": "Files are processed locally. Conversion limits are explained in each workspace."
   },
   {
+    "id": "doc-cloud",
+    "name": "Doc Cloud",
+    "category": "Documents",
+    "tagline": "Make room for your words.",
+    "description": "A free, focused workspace for writing, editing and organizing your documents.",
+    "status": "Coming soon",
+    "comingSoon": true,
+    "platform": "Desktop",
+    "accent": "#506bff",
+    "icon": "document",
+    "features": [
+      "Rich text documents",
+      "Writing templates",
+      "Local document library"
+    ],
+    "note": "Coming soon. Doc Cloud is in development and is not available to install from the launcher yet."
+  },
+  {
+    "id": "sheet-cloud",
+    "name": "Sheet Cloud",
+    "category": "Spreadsheets",
+    "tagline": "A clearer view of your numbers.",
+    "description": "A free spreadsheet workspace for formulas, tables, charts and everyday planning.",
+    "status": "Coming soon",
+    "comingSoon": true,
+    "platform": "Desktop",
+    "accent": "#00c06e",
+    "icon": "spreadsheet",
+    "features": [
+      "Formulas and tables",
+      "Charts and planning",
+      "Local workbook library"
+    ],
+    "note": "Coming soon. Sheet Cloud is in development and is not available to install from the launcher yet."
+  },
+  {
     "id": "launcher",
     "name": "BlueCloud Launcher",
     "category": "Your app library",
     "tagline": "One home for your BlueCloud apps.",
     "description": "Discover, install, open and update BlueCloud apps from a single Windows library. No account needed to manage your apps.",
-    "version": "0.6.2",
+    "version": "0.7.0",
     "status": "Alpha",
     "platform": "Windows x64",
     "accent": "#83aeff",
     "icon": "cloud",
     "features": [
-      "One library for all three apps",
+      "One library for your BlueCloud apps",
       "Verified package downloads",
       "Version checks and release notes",
       "Installed apps stay available offline",

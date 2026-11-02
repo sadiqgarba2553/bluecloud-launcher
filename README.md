@@ -1,4 +1,4 @@
-# BlueCloud Launcher 0.6.2
+# BlueCloud Launcher 0.7.0
 
 Install, open and update Coneic, Quranly and Tooldeck in their own public repositories. Downloads support pause/resume across restarts, size/speed/time feedback, integrity verification and restoring the previous app version. Windows updates use a small native helper, acknowledge helper startup and verify the installed runtime before recording success. App profiles stay in place.
 
