@@ -2,7 +2,8 @@
   "coneic": "0.6.0",
   "quranly": "0.6.0",
   "tooldeck": "0.5.1",
-  "launcher": "0.7.1",
+  "launcher": "0.7.2",
   "doc-cloud": "1.0.0",
-  "sheet-cloud": "0.1.0"
+  "sheet-cloud": "0.1.0",
+  "slide-cloud": "0.1.0"
 }

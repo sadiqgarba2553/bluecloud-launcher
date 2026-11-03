@@ -7,6 +7,7 @@ const repositories = {
   launcher: 'sadiqgarba2553/bluecloud-launcher',
   'doc-cloud': 'sadiqgarba2553/doc-cloud',
   'sheet-cloud': 'sadiqgarba2553/sheet-cloud',
+  'slide-cloud': 'sadiqgarba2553/slide-cloud',
 };
 const spki = 'MCowBQYDK2VwAyEATRxYq/F2sfUOkJdIVmk5AQ8ROyq9lRtTEKcIhsbahMo=';
 function decode(value) {
