@@ -2,7 +2,7 @@ const crypto = require('node:crypto');
 const path = require('node:path');
 const semver = require('semver');
 const REPOSITORIES = require('../config.json').repositories;
-const IDS = new Set(['coneic','quranly','tooldeck','launcher']);
+const IDS = new Set(Object.keys(REPOSITORIES));
 function validAppId(id){return typeof id==='string'&&/^[a-z][a-z0-9-]{0,63}$/.test(id)&&! /^(con|prn|aux|nul|com[1-9]|lpt[1-9])$/.test(id);}
 function safePath(root, relative) {
   if (typeof relative !== 'string' || !relative || relative.includes('\\') || relative.includes(':') || path.posix.isAbsolute(relative) || relative.split('/').some(s=>s==='..'||s==='.'||!s)) throw Error('Invalid package path');

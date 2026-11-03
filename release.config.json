@@ -1,16 +1,16 @@
 {
   "appId": "launcher",
   "repository": "sadiqgarba2553/bluecloud-launcher",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "sourceName": "BlueCloud-Launcher",
-  "title": "BlueCloud Launcher 0.7.0 - Windows",
-  "notes": "New BlueCloud squircle logo and a simpler blue-and-white app library. Doc Cloud and Sheet Cloud are coming soon. Tooldeck 0.5.1 adds its new logo and updated packaging systems. Verified updates, resumable downloads, progress feedback, previous-version recovery and the native Windows update helper remain available.",
+  "title": "BlueCloud Launcher 0.7.1 - Doc Cloud and Sheet Cloud",
+  "notes": "Doc Cloud 1.0.0 and Sheet Cloud 0.1.0 are now available as free Windows alpha apps. Install, open and update them from the launcher, with squircle logos, signed release metadata, SHA-256 package verification and existing download/recovery controls. Updated app catalog and download systems; existing libraries and profiles are preserved.",
   "localAssets": [
-    "release/BlueCloud-Launcher-Setup-0.7.0-x64.exe"
+    "release/BlueCloud-Launcher-Setup-0.7.1-x64.exe"
   ],
   "unpackedDirectory": "release/win-unpacked",
   "package": {
-    "name": "BlueCloud-Launcher-Setup-0.7.0-x64.exe",
+    "name": "BlueCloud-Launcher-Setup-0.7.1-x64.exe",
     "type": "nsis",
     "minimumLauncher": "0.1.0-alpha"
   }

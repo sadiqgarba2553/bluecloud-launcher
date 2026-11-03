@@ -10,3 +10,20 @@ test('download tickets authenticate the app and expiry before any upstream reque
   assert.equal((await handle(new Request(make(),{method:'POST'}),options)).status,405);
   const unsafe=await handle(new Request(make()),{...options,fetch:async()=>({ok:true,url:'https://evil.example/file'})});assert.equal(unsafe.status,502);
 });
+
+test('document and spreadsheet tickets resolve only to their own managed packages', async()=>{
+  const {handle}=await import('../supabase/functions/app-release-download/index.mjs');
+  const pair=generateKeyPairSync('ed25519'),key=await crypto.subtle.importKey('spki',pair.publicKey.export({type:'spki',format:'der'}),{name:'Ed25519'},false,['verify']);
+  for(const [appId,version] of [['doc-cloud','1.0.0'],['sheet-cloud','0.1.0']]){
+    const bytes=Buffer.from(JSON.stringify({purpose:'bluecloud-app-download-v1',appId,version,expiresAt:new Date(Date.now()+60000).toISOString()}));
+    const url='https://example.test/?ticket='+bytes.toString('base64url')+'&signature='+sign(null,bytes,pair.privateKey).toString('base64url');
+    let calls=0;
+    const response=await handle(new Request(url),{publicKey:key,fetch:async source=>{
+      calls++;
+      assert.equal(source,`https://github.com/sadiqgarba2553/${appId}/releases/download/v${version}/${appId}-${version}-win-x64.zip`);
+      return {ok:true,url:'https://release-assets.githubusercontent.com/verified-package',body:null};
+    }});
+    assert.equal(response.status,302);
+    assert.equal(calls,1);
+  }
+});

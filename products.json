@@ -64,9 +64,8 @@
     "category": "Documents",
     "tagline": "Make room for your words.",
     "description": "A free, focused workspace for writing, editing and organizing your documents.",
-    "status": "Coming soon",
-    "comingSoon": true,
-    "platform": "Desktop",
+    "status": "Alpha",
+    "platform": "Windows x64",
     "accent": "#506bff",
     "icon": "document",
     "features": [
@@ -74,7 +73,8 @@
       "Writing templates",
       "Local document library"
     ],
-    "note": "Coming soon. Doc Cloud is in development and is not available to install from the launcher yet."
+    "note": "Alpha preview. Local documents, templates, history and basic DOCX conversion. Full Word compatibility and hosted collaboration are not included.",
+    "version": "1.0.0"
   },
   {
     "id": "sheet-cloud",
@@ -82,9 +82,8 @@
     "category": "Spreadsheets",
     "tagline": "A clearer view of your numbers.",
     "description": "A free spreadsheet workspace for formulas, tables, charts and everyday planning.",
-    "status": "Coming soon",
-    "comingSoon": true,
-    "platform": "Desktop",
+    "status": "Alpha",
+    "platform": "Windows x64",
     "accent": "#00c06e",
     "icon": "spreadsheet",
     "features": [
@@ -92,7 +91,8 @@
       "Charts and planning",
       "Local workbook library"
     ],
-    "note": "Coming soon. Sheet Cloud is in development and is not available to install from the launcher yet."
+    "note": "Alpha preview. Local workbooks, formulas and basic XLSX/CSV exchange. Charts are previews; full Excel compatibility and hosted collaboration are not included.",
+    "version": "0.1.0"
   },
   {
     "id": "launcher",
@@ -100,7 +100,7 @@
     "category": "Your app library",
     "tagline": "One home for your BlueCloud apps.",
     "description": "Discover, install, open and update BlueCloud apps from a single Windows library. No account needed to manage your apps.",
-    "version": "0.7.0",
+    "version": "0.7.1",
     "status": "Alpha",
     "platform": "Windows x64",
     "accent": "#83aeff",

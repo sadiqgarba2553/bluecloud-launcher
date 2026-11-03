@@ -5,6 +5,8 @@ const repositories = {
   quranly: 'sadiqgarba2553/quranly-pc',
   tooldeck: 'sadiqgarba2553/tooldeck',
   launcher: 'sadiqgarba2553/bluecloud-launcher',
+  'doc-cloud': 'sadiqgarba2553/doc-cloud',
+  'sheet-cloud': 'sadiqgarba2553/sheet-cloud',
 };
 const spki = 'MCowBQYDK2VwAyEATRxYq/F2sfUOkJdIVmk5AQ8ROyq9lRtTEKcIhsbahMo=';
 function decode(value) {
