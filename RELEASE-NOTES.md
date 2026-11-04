@@ -1,11 +1,10 @@
-# BlueCloud Launcher 0.7.2 for Windows
+# BlueCloud Launcher 0.8.0
 
-Download **BlueCloud-Launcher-Setup-0.7.2-x64.exe** to install or update.
+Canvas Cloud joins Doc Cloud, Sheet Cloud and Slide Cloud in the launcher. Updated app systems and squircle logos, document mail merge and layouts, spreadsheet charts/pivots/Goal Seek, presentation tables/charts/effects, and a local whiteboard with SVG/PNG exports. Free Windows alpha apps with verified downloads. Existing libraries and update recovery are preserved; Office compatibility and collaboration remain limited.
 
-- **Slide Cloud joins the family.** Create, edit and organize local presentations with text, basic shapes, images, editable templates, speaker notes, history and slideshow. Basic PPTX import/export and slide-only print/PDF are included.
-- **New orange squircle logo.** The supplied presentation artwork appears in the library and the native app and Windows icons.
-- **Updated catalog and download systems.** Slide Cloud has its own source/release repository, signed download tickets and SHA-256-verified managed package.
-- **All six apps in one library.** Coneic, Quranly, Tooldeck, Doc Cloud and Sheet Cloud remain available. Install-all, updates, pause/resume, rollback, offline library access and the native Windows updater are preserved.
-- **Your data stays in place.** Existing app identifiers, profiles, installed content and settings are unchanged.
+- Doc Cloud 1.1.0
+- Sheet Cloud 0.2.0
+- Slide Cloud 0.2.0
+- Canvas Cloud 0.2.0 (new)
 
-Windows x64 unsigned alpha. Slide Cloud 0.1.0 does not reproduce complete PowerPoint compatibility, advanced media/animations, hosted collaboration or multi-monitor Presenter View. WebView2 is required. See its app release notes and known limitations.
+Update the launcher first to see Canvas Cloud. Packages use signed feed metadata and SHA-256 verification; Windows publisher certificates are not yet available.

@@ -14,7 +14,7 @@ test('download tickets authenticate the app and expiry before any upstream reque
 test('office app tickets resolve only to their own managed packages', async()=>{
   const {handle}=await import('../supabase/functions/app-release-download/index.mjs');
   const pair=generateKeyPairSync('ed25519'),key=await crypto.subtle.importKey('spki',pair.publicKey.export({type:'spki',format:'der'}),{name:'Ed25519'},false,['verify']);
-  for(const [appId,version] of [['doc-cloud','1.0.0'],['sheet-cloud','0.1.0'],['slide-cloud','0.1.0']]){
+  for(const [appId,version] of [['doc-cloud','1.1.0'],['sheet-cloud','0.2.0'],['slide-cloud','0.2.0'],['canvas-cloud','0.2.0']]){
     const bytes=Buffer.from(JSON.stringify({purpose:'bluecloud-app-download-v1',appId,version,expiresAt:new Date(Date.now()+60000).toISOString()}));
     const url='https://example.test/?ticket='+bytes.toString('base64url')+'&signature='+sign(null,bytes,pair.privateKey).toString('base64url');
     let calls=0;

@@ -69,12 +69,12 @@
     "accent": "#506bff",
     "icon": "document",
     "features": [
-      "Rich text documents",
-      "Writing templates",
-      "Local document library"
+      "Rich text, pageless drafting and column previews",
+      "CSV mail merge and recipient previews",
+      "TOC snapshots and local document library"
     ],
-    "note": "Alpha preview. Local documents, templates, history and basic DOCX conversion. Full Word compatibility and hosted collaboration are not included.",
-    "version": "1.0.0"
+    "note": "Expanded alpha. Continuous column preview, local mail merge and basic Office conversion. Advanced layout and hosted collaboration remain incomplete.",
+    "version": "1.1.0"
   },
   {
     "id": "sheet-cloud",
@@ -87,12 +87,12 @@
     "accent": "#00c06e",
     "icon": "spreadsheet",
     "features": [
-      "Formulas and tables",
-      "Charts and planning",
-      "Local workbook library"
+      "Formulas and XLSX/CSV/JSON exchange",
+      "Persistent range charts and pivot summaries",
+      "Live formula Goal Seek and data tools"
     ],
-    "note": "Alpha preview. Local workbooks, formulas and basic XLSX/CSV exchange. Charts are previews; full Excel compatibility and hosted collaboration are not included.",
-    "version": "0.1.0"
+    "note": "Expanded alpha. Static pivot summaries and persisted native charts; full Excel fidelity, VBA and hosted collaboration are not included.",
+    "version": "0.2.0"
   },
   {
     "id": "slide-cloud",
@@ -100,18 +100,37 @@
     "category": "Presentations",
     "tagline": "Make your ideas matter.",
     "description": "A free local-first presentation editor with editable slides, templates, speaker notes, slideshow and basic PPTX exchange.",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "status": "Alpha",
     "platform": "Windows x64",
     "accent": "#ff914d",
     "icon": "presentation",
     "features": [
-      "Editable text, shapes and embedded images",
-      "Slide ordering, notes and slideshow",
-      "Local autosave, named history and native backups",
-      "Basic PPTX import and export"
+      "Editable tables, chart data, shapes and text",
+      "Slideshow transitions and entrance effects",
+      "Speaker notes and same-window presenter console",
+      "Native backups and basic PPTX exchange"
     ],
-    "note": "Alpha preview. Basic PowerPoint conversion; themes, masters, advanced media, animations and multi-monitor Presenter View are not reproduced. No hosted collaboration."
+    "note": "Expanded alpha. Presenter notes share the same window; no independent audience display. PPTX compatibility is partial; native slideshow effects do not round-trip through PowerPoint."
+  },
+  {
+    "id": "canvas-cloud",
+    "name": "Canvas Cloud",
+    "category": "Whiteboard",
+    "tagline": "Space to think.",
+    "description": "A free local-first whiteboard for notes, diagrams, sketches and visual planning.",
+    "version": "0.2.0",
+    "status": "Alpha",
+    "platform": "Windows x64",
+    "accent": "#7c52c4",
+    "icon": "canvas",
+    "features": [
+      "Notes, shapes, connectors and ink",
+      "Minimap, search, alignment and frames",
+      "Editable tables, Kanban text and local replies",
+      "Native backups, SVG and PNG export"
+    ],
+    "note": "Windows alpha. Local annotations and boards; no live multiplayer, cloud sync or complete competitor parity."
   },
   {
     "id": "launcher",
@@ -119,7 +138,7 @@
     "category": "Your app library",
     "tagline": "One home for your BlueCloud apps.",
     "description": "Discover, install, open and update BlueCloud apps from a single Windows library. No account needed to manage your apps.",
-    "version": "0.7.2",
+    "version": "0.8.0",
     "status": "Alpha",
     "platform": "Windows x64",
     "accent": "#83aeff",

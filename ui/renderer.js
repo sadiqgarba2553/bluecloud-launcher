@@ -2,7 +2,7 @@ const $=id=>document.getElementById(id);
 let current,filter='all',view=localStorage.getItem('bluecloud-view')||'grid',uiError='';
 let bulkRunning=false,lastCheck=0;
 const jobs=new Map();
-const asset={coneic:'coneic.png',quranly:'quranly.png',tooldeck:'tooldeck.png','doc-cloud':'doc-cloud.png','sheet-cloud':'sheet-cloud.png','slide-cloud':'slide-cloud.png'};
+const asset={coneic:'coneic.png',quranly:'quranly.png',tooldeck:'tooldeck.png','doc-cloud':'doc-cloud.png','sheet-cloud':'sheet-cloud.png','slide-cloud':'slide-cloud.png','canvas-cloud':'canvas-cloud.png'};
 function element(tag,className,text){const e=document.createElement(tag);if(className)e.className=className;if(text!==undefined)e.textContent=text;return e;}
 function updateAvailable(p){const release=current.releases.find(r=>r.appId===p.id);return Boolean(current.installed[p.id]&&release?.updateAvailable);}
 function notice(){const message=uiError||current?.error||'';$('notice').textContent=message;$('notice').hidden=!message;}

@@ -1,16 +1,16 @@
 {
   "appId": "launcher",
   "repository": "sadiqgarba2553/bluecloud-launcher",
-  "version": "0.7.2",
+  "version": "0.8.0",
   "sourceName": "BlueCloud-Launcher",
-  "title": "BlueCloud Launcher 0.7.2 - Slide Cloud",
-  "notes": "Slide Cloud 0.1.0 joins Doc Cloud and Sheet Cloud as a free Windows alpha app. New orange squircle logo, editable slides, local templates and autosave, speaker notes, slideshow, native backups and basic PPTX import/export. Updated catalog and signed download systems; existing apps, profiles and download/recovery controls are preserved.",
+  "title": "BlueCloud Launcher 0.8.0 — Office suite expansion",
+  "notes": "Canvas Cloud joins Doc Cloud, Sheet Cloud and Slide Cloud in the launcher. Updated app systems and squircle logos, document mail merge and layouts, spreadsheet charts/pivots/Goal Seek, presentation tables/charts/effects, and a local whiteboard with SVG/PNG exports. Free Windows alpha apps with verified downloads. Existing libraries and update recovery are preserved; Office compatibility and collaboration remain limited.",
   "localAssets": [
-    "release/BlueCloud-Launcher-Setup-0.7.2-x64.exe"
+    "release/BlueCloud-Launcher-Setup-0.8.0-x64.exe"
   ],
   "unpackedDirectory": "release/win-unpacked",
   "package": {
-    "name": "BlueCloud-Launcher-Setup-0.7.2-x64.exe",
+    "name": "BlueCloud-Launcher-Setup-0.8.0-x64.exe",
     "type": "nsis",
     "minimumLauncher": "0.1.0-alpha"
   }
