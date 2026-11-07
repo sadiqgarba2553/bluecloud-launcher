@@ -1,0 +1,31 @@
+name: Build Linux x64 packages
+on:
+  workflow_dispatch:
+  push:
+    branches: ['linux/launcher-updates']
+permissions:
+  contents: read
+jobs:
+  linux:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: node --test tests/*.test.cjs
+      - run: npm run dist:linux
+      - run: node tools/linux-metadata.mjs launcher release
+      - name: Collect Linux packages
+        run: |
+          mkdir dist-linux
+          cp release/*.AppImage release/*.deb release/app-release-linux.json dist-linux/
+          cp docs/LINUX-RELEASE.md dist-linux/LINUX-README.md
+          cd dist-linux
+          sha256sum -- * > SHA256SUMS-linux-x64.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-x64
+          path: dist-linux/

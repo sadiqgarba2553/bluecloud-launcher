@@ -1,3 +1,4 @@
+if(process.platform==='linux'){require('./linux-main.cjs');return;}
 const {app,BrowserWindow,ipcMain,Menu,dialog,shell}=require('electron');
 const fs=require('original-fs').promises;
 const path=require('node:path');

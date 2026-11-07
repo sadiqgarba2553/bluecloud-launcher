@@ -21,7 +21,7 @@ function trustedDownload(input,appId) {
   }
   return url;
 }
-function verifyFeed(envelope, publicKey, channel, currentVersion, now=Date.now()) {
+function verifyFeed(envelope, publicKey, channel, currentVersion, now=Date.now(), platform='win32') {
   if (!envelope || typeof envelope.payload!=='string'||typeof envelope.signature!=='string'||envelope.payload.length>1000000) throw Error('Invalid release feed');
   if (!crypto.verify(null,Buffer.from(envelope.payload),publicKey,Buffer.from(envelope.signature,'base64'))) throw Error('Release signature is invalid');
   const feed=JSON.parse(envelope.payload);
@@ -30,11 +30,11 @@ function verifyFeed(envelope, publicKey, channel, currentVersion, now=Date.now()
   if(!Number.isFinite(published)||!Number.isFinite(expires)||published>now+300000||expires<=now||expires<=published) throw Error('Release feed is expired or not yet valid');
   const seen=new Set();
   for(const r of feed.releases) {
-    if(!validAppId(r.appId)||seen.has(r.appId)||r.platform!=='win32'||r.arch!=='x64'||!semver.valid(r.version)||!semver.valid(r.minimumLauncher)) throw Error('Unsupported app release');
+    if(!validAppId(r.appId)||seen.has(r.appId)||r.platform!==platform||r.arch!=='x64'||!semver.valid(r.version)||!semver.valid(r.minimumLauncher)) throw Error('Unsupported app release');
     seen.add(r.appId);
     if(!Number.isSafeInteger(r.size)||r.size<1||r.size>1500000000||!/^[a-f0-9]{64}$/.test(r.sha256)) throw Error('Invalid package integrity data');
-    if(r.appId==='launcher' ? r.packageType!=='nsis' : r.packageType!=='zip') throw Error('Unsupported package type');
-    if(r.appId!=='launcher') { safePath('C:/BlueCloud',r.executable); if(!r.executable.endsWith('.exe'))throw Error('Missing app executable'); }
+    if(platform==='linux' ? r.packageType!=='appimage' : (r.appId==='launcher' ? r.packageType!=='nsis' : r.packageType!=='zip')) throw Error('Unsupported package type');
+    if(platform!=='linux'&&r.appId!=='launcher') { safePath('C:/BlueCloud',r.executable); if(!r.executable.endsWith('.exe'))throw Error('Missing app executable'); }
     if(!Number.isSafeInteger(r.unpackedSize)||r.unpackedSize<1||r.unpackedSize>4000000000) throw Error('Invalid expanded package size');
     trustedDownload(r.url,r.appId);
   }
