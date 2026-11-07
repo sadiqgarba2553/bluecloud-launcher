@@ -17,13 +17,13 @@ if(mode==='metadata'){
 }else if(mode==='feed'){
  const [planFile,output]=args;if(!process.env.BLUECLOUD_LINUX_SIGNING_KEY)throw Error('Set BLUECLOUD_LINUX_SIGNING_KEY to the local Linux release key');
  const key=createPrivateKey(await readFile(process.env.BLUECLOUD_LINUX_SIGNING_KEY));if(createPublicKey(key).export({type:'spki',format:'pem'})!==linux.publicKey)throw Error('Signing key does not match launcher trust key');
- const plan=JSON.parse(await readFile(planFile)),releases=[];
- for(const [id,version]of Object.entries(plan)){
+ const plan=JSON.parse(await readFile(planFile));
+ const releases=await Promise.all(Object.entries(plan).map(async ([id,version])=>{
   const repo=config.repositories[id];if(!repo||!/^\d+\.\d+\.\d+(?:-[\w.-]+)?$/.test(version))throw Error('Invalid Linux release plan');
   const res=await fetch(`https://github.com/${repo}/releases/download/linux-v${version}/app-release-linux.json`);if(!res.ok)throw Error(`Linux metadata unavailable: ${id} (${res.status})`);const r=await res.json();
   if(r.appId!==id||r.version!==version||r.repository!==repo)throw Error('Linux metadata identity mismatch');require('../electron/security.cjs').trustedDownload(r.url,id);
-  const asset=await fetch(r.url);if(!asset.ok||!asset.body)throw Error('Public Linux download unavailable: '+id);const hash=createHash('sha256');let size=0;for await(const chunk of asset.body){hash.update(chunk);size+=chunk.length;}if(size!==r.size||hash.digest('hex')!==r.sha256)throw Error('Public Linux download integrity failure: '+id);releases.push(r);
- }
+  const asset=await fetch(r.url);if(!asset.ok||!asset.body)throw Error('Public Linux download unavailable: '+id);const hash=createHash('sha256');let size=0;for await(const chunk of asset.body){hash.update(chunk);size+=chunk.length;}if(size!==r.size||hash.digest('hex')!==r.sha256)throw Error('Public Linux download integrity failure: '+id);return r;
+ }));
  const now=new Date(),expires=new Date(now.getTime()+365*86400000),payload=JSON.stringify({schemaVersion:1,channel:'linux-alpha',publishedAt:now.toISOString(),expiresAt:expires.toISOString(),releases});
  const envelope={payload,signature:sign(null,Buffer.from(payload),key).toString('base64')};require('../electron/security.cjs').verifyFeed(envelope,linux.publicKey,'linux-alpha',require('../package.json').version,Date.now(),'linux');
  await mkdir(path.dirname(output),{recursive:true});await writeFile(output,JSON.stringify(envelope,null,2)+'\n');console.log('Signed Linux feed; public downloads verified');
